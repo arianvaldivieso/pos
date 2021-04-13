@@ -1,0 +1,38 @@
+version: '2'
+services:
+  myapp:
+    image: docker.io/bitnami/codeigniter:3
+    ports:
+      - '8000:8000'
+    volumes:
+      - './:/app/myapp'
+    depends_on:
+      - sql
+  sql:
+    tty: true
+    image: 'docker.io/bitnami/mariadb:10.2-debian-10'
+    volumes:
+      - './data:/var/lib/mysql'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_DATABASE=pos
+      - MARIADB_PASSWORD=33klwZ_76
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: dev_pma
+    links:
+      - sql
+    depends_on:
+      - sql
+    environment:
+      PMA_HOST: sql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      VIRTUAL_HOST: "phpmyadmin.pilargolfdigital.ga"
+      LETSENCRYPT_HOST: "phpmyadmin.pilargolfdigital.ga"
+      LETSENCRYPT_EMAIL: "admin@pilargolfdigital.ga"
+    restart: always
+    ports:
+      - "3001:80"
+    networks:
+      - default
